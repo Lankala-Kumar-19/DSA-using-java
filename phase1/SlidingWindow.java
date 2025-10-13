@@ -19,6 +19,7 @@ public class SlidingWindow {
     }
     public static int longestSubstring(String s){
         Map<Character,Integer> map = new HashMap<>();
+        
         int maxLen = 0;
         int left = 0,right=0;
         for(right=0;right<s.length();right++){
