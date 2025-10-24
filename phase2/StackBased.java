@@ -136,7 +136,7 @@ public class StackBased {
         // printArray(previousSmallerElement(a));
         //printArray(nextSmallerElement(new int[]{4, 5, 2, 10, 8}));
         //printArray(stockSpan(new int[]{100, 80, 60, 70, 60, 75, 85}));
-        // printArray(dailyTemperatures(new int[]{73, 74, 75, 71, 69, 72, 76, 73}));
-
+        printArray(dailyTemperatures(new int[]{73, 74, 75, 71, 69, 72, 76, 73}));
+    
     }
 }
