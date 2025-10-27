@@ -790,6 +790,31 @@ static Node prev = null;
         //     cur=cur.right;
         // }
     }
+    public static void morrisTraversal(Node root){
+        if(root==null) return;
+        Node cur = root;
+        while (cur!=null) {
+            if(cur.left==null){
+                System.out.print(cur.data+" ");
+                cur = cur.right;
+            }
+            else{
+                Node pred = cur.left;
+
+                while (pred.right!=null && pred.right!=cur) {
+                        pred=pred.right;
+                }
+                if(pred.right==null){
+                    pred.right=cur;
+                    cur=cur.left;
+                }else{
+                    pred.right=null;
+                    System.out.print(cur.data+" ");
+                    cur=cur.right;
+                }
+            }
+        }
+    }
 
 
     public static void main(String[] args) {
@@ -844,12 +869,16 @@ static Node prev = null;
         y.right.right = new Node(6);
         y.right.right.right = new Node(7);
 
-        flatten(y);
-        Node c = y;
-        while(c!=null){
-            System.out.print(c.data+" ");
-            c=c.right;
-        }
+        // flatten(y);
+        // Node c = y;
+        // while(c!=null){
+        //     System.out.print(c.data+" ");
+        //     c=c.right;
+        // }
+
+        inOrder(root);
+        System.out.println();
+        morrisTraversal(root);
 
         //System.out.println(serialize(x));
 
