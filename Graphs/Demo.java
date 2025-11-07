@@ -1,8 +1,10 @@
 package Graphs;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 class Pair{
     int first,second;
     int time;
@@ -313,12 +315,140 @@ public class Demo {
         }
         return dist;
     }
-    public static void main(String[] args) {
-        int v = 5;
-        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
-        for (int i = 0; i < v; i++) {
-            adj.add(new ArrayList<>());
+    public static void dfsX(int row,int col,int[][] vis,char mat[][],int delrow[],int[] delcol){
+        vis[row][col]=1;
+        int n=mat.length;
+        int m=mat[0].length;
+        for(int i=0;i<4;i++){
+            int nrow = row+delrow[i];
+            int ncol = col + delcol[i];
+            if(nrow>=0 && nrow<n && ncol>=0 && ncol<m && vis[nrow][ncol]==0 && mat[nrow][ncol]=='O'){
+                dfsX(nrow, ncol, vis, mat, delrow, delcol);
+            }
         }
+    }
+    public static char[][] OtoX(int n,int m,char[][] mat){
+        int[][] vis = new int[n][m];
+        int[] delrow = {-1,0,1,0};
+        int[] delcol = {0,-1,0,1};
+        for(int j=0;j<m;j++){
+            if(vis[0][j]==0 && mat[0][j]=='O'){
+                dfsX(0, j, vis, mat, delrow, delcol);
+            }
+            if(vis[n-1][j]==0 && mat[n-1][j]=='O'){
+                dfsX(n-1, j, vis, mat, delrow, delcol);
+            }
+        }
+        for(int i=0;i<n;i++){
+            if(vis[i][0]==0 && mat[i][0]=='O'){
+                dfsX(i, 0, vis, mat, delrow, delcol);
+            }
+            if(vis[i][m-1]==0 && mat[i][m-1]=='O'){
+                dfsX(i, m-1, vis, mat, delrow, delcol);
+            }
+        }
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(vis[i][j]==0 && mat[i][j]=='O'){
+                    vis[i][j]=1;
+                    mat[i][j]='X';
+                }
+            }
+        }
+        return mat;
+    }
+    public static int numberOfEnclaves(int[][] grid){
+        int n=grid.length;
+        int m=grid[0].length;
+        int[][] vis = new int[n][m];
+        Queue<Pair> q = new LinkedList<>();
+        for(int i=0;i<m;i++){
+            if(vis[0][i]==0 && grid[0][i]==1){
+                vis[0][i]=1;
+                q.offer(new Pair(0, i));
+            }
+            if(vis[n-1][i]==0 && grid[n-1][i]==1){
+                vis[n-1][i]=1;
+                q.offer(new Pair(n-1, i));
+            }
+        }
+        for(int j=0;j<n;j++){
+            if(vis[j][0]==0 && grid[j][0]==1){
+                vis[j][0]=1;
+                q.offer(new Pair(j, 0));
+            }
+            if(vis[j][m-1]==0 && grid[j][m-1]==1){
+                vis[j][m-1]=1;
+                q.offer(new Pair(j, m-1));
+            }
+        }
+        int[] delrow={-1,0,1,0};
+        int[] delcol={0,-1,0,1};
+        while (!q.isEmpty()) {
+            int row = q.peek().first;
+            int col = q.peek().second;
+            q.poll();
+            for(int i=0;i<4;i++){
+                int nrow = row + delrow[i];
+                int ncol = col+delcol[i];
+                if(nrow>=0 && nrow<n && ncol>=0 && ncol<m && vis[nrow][ncol]==0 && grid[nrow][ncol]==1){
+                    vis[nrow][ncol]=1;
+                    q.offer(new Pair(nrow, ncol));
+                }
+            }
+        }
+        int cnt=0;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(vis[i][j]==0 && grid[i][j]==1){
+                    vis[i][j]=1;
+                    cnt++;
+                }
+            }
+        }
+        return cnt;
+    }
+
+    public static int numberOfDistinctIslands(int[][] grid){
+        Set<ArrayList<String>> set = new HashSet<>();
+        int n=grid.length;
+        int m=grid[0].length;
+        int[][] vis = new int[n][m];
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(vis[i][j]==0 && grid[i][j]==1){
+                    ArrayList<String> vec = new ArrayList<>();
+                    numberOfDistinctIslands(i, j, vis, grid, vec, i, j);
+                    set.add(vec);
+                }
+            }
+        }
+        return set.size();
+    }
+    public static void numberOfDistinctIslands(int row,int col,int[][] vis,int[][] grid,ArrayList<String> vec,int row0,int col0){
+        vis[row][col]=1;
+        vec.add(makeKey(row-row0,col-col0));
+        int n = grid.length;
+        int m = grid[0].length;
+        int[] delrow = {-1,0,1,0};
+        int[] delcol = {0,-1,0,1};
+        for(int i=0;i<4;i++){
+            int nrow = row+delrow[i];
+            int ncol = col + delcol[i];
+            if(nrow>=0 && nrow<n && ncol>=0 && ncol<m && vis[nrow][ncol]==0 && grid[nrow][ncol]==1){
+                numberOfDistinctIslands(nrow, ncol, vis, grid, vec, row0, col0);
+            }
+        }
+    }
+    public static String makeKey(int r,int c){
+        return r+","+c;
+    }
+    public static void main(String[] args) {
+        // int v = 5;
+        // ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
+        // for (int i = 0; i < v; i++) {
+        //     adj.add(new ArrayList<>());
+        // }
         // adj.get(0).add(1);
         // // adj.get(0).add(4);
         // // adj.get(1).add(0);
@@ -330,37 +460,44 @@ public class Demo {
         // // System.out.println(bfsOfGraph(v,adj));
         // // System.out.println(dfsOfGraph(v, adj));
         // // System.out.println(numberOfProvinces(v, adj));
-        int[][] matrix = {
-            {0, 1, 1, 0},
-            {0, 1, 1, 0},
-            {0, 0, 1, 0},
-            {0, 0, 0, 0},
+//         int[][] matrix = {
+//             {0, 1, 1, 0},
+//             {0, 1, 1, 0},
+//             {0, 0, 1, 0},
+//             {0, 0, 0, 0},
         
-            {1, 1, 0, 1}
-        };
-        //System.out.println(numberOfIslands(matrix));
-        int[][] image = {
-            {0, 0, 0},
-            {0, 1, 0},
-            {1, 0, 1}
-        };
-        // printGrid(image);
-        // floodFill(1, 1, 2, image);
-        // System.out.println();
-        // printGrid(image);
+//             {1, 1, 0, 1}
+//         };
+//         //System.out.println(numberOfIslands(matrix));
+//         int[][] image = {
+//             {0, 0, 0},
+//             {0, 1, 0},
+//             {1, 0, 1}
+//         };
+//         // printGrid(image);
+//         // floodFill(1, 1, 2, image);
+//         // System.out.println();
+//         // printGrid(image);
 
-        int[][] grid = {
-            {2, 1, 1},
-            {1, 1, 0},
-            {0, 1, 1}
-        };
-        printGrid(image);
-        System.out.println();
-        printGrid(distanceOfnearestCell(image));
-       // System.out.println(rottenOranges(2, 1, grid));
-        //System.out.println();
-        //printGrid(grid);
-        //System.out.println(isCycle(v, adj));
+//         int[][] grid = {
+//             {2, 1, 1},
+//             {1, 1, 0},
+//             {0, 1, 1}
+//         };
+//         printGrid(image);
+//         System.out.println();
+//         printGrid(distanceOfnearestCell(image));
+//        // System.out.println(rottenOranges(2, 1, grid));
+//         //System.out.println();
+//         //printGrid(grid);
+//         //System.out.println(isCycle(v, adj));
+//         int[][] grid1 = {
+//     {0, 0, 0, 0},
+//     {1, 0, 1, 0},
+//     {0, 1, 1, 0},
+//     {0, 0, 0, 0}
+// };
+//         System.out.println(numberOfEnclaves(grid1));
 
     }
 }
