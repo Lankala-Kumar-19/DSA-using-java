@@ -1,10 +1,8 @@
 package Trees;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
-import javax.xml.crypto.NodeSetData;
+
 
 class BSTNode{
     BSTNode left,right;
