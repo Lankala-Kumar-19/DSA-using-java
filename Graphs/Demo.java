@@ -1,10 +1,6 @@
 package Graphs;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 class Pair{
     int first,second;
     int time;
@@ -16,6 +12,9 @@ class Pair{
         this.first=first;
         this.second=second;
         this.time=time;
+    }
+    public String toString(){
+        return "first: "+first+" second: "+second+" x: "+time;
     }
 
 }
@@ -229,8 +228,6 @@ public class Demo {
     //             }
     //         }
     //     }
-
-
     // }
     public static boolean isCycle(int v,ArrayList<ArrayList<Integer>> ad){
         // int n = ad.size();
@@ -408,7 +405,6 @@ public class Demo {
         }
         return cnt;
     }
-
     public static int numberOfDistinctIslands(int[][] grid){
         Set<ArrayList<String>> set = new HashSet<>();
         int n=grid.length;
@@ -443,22 +439,305 @@ public class Demo {
     public static String makeKey(int r,int c){
         return r+","+c;
     }
+    public static boolean checkBipartiteBFS(int v,ArrayList<ArrayList<Integer>> ad){
+        int[] vis = new int[v];
+        for(int i=0;i<v;i++) vis[i]=-1;
+        for(int i=0;i<v;i++){
+            if(vis[i]==-1){
+                Queue<Integer> q = new LinkedList<>();
+                q.offer(i);
+                vis[i]=0;
+                while (!q.isEmpty()) {
+                    int cur = q.peek();
+                    q.poll();
+                    for(Integer it : ad.get(cur)){
+                        if(vis[it]==-1){
+                            vis[it] = 1-vis[cur];
+                            q.offer(it);
+                        }
+                        else if(vis[it]==vis[cur]){
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+
+    }
+    public static boolean checkBipartiteDFS(int v,ArrayList<ArrayList<Integer>> ad){
+        int[] vis = new int[v];
+        Arrays.fill(vis, -1);
+        for(int i=0;i<v;i++){
+            if(vis[i]!=-1){
+                vis[i]=0;
+                if(!checkBipartiteDFSHelper(i, vis, ad)) return false;
+            }
+        }
+        return true;
+    }
+    public static boolean checkBipartiteDFSHelper(int n,int[] vis,ArrayList<ArrayList<Integer>> ad){
+        for(Integer it : ad.get(n)){
+            if(vis[it]==-1){
+                vis[it] = 1-vis[n];
+                if(!checkBipartiteDFSHelper(it, vis, ad)) return false;
+            }
+            else if(vis[it]==vis[n ]) return false;
+        }
+        return true;
+    }
+    public static boolean detectCycleDFS(int v,ArrayList<ArrayList<Integer>> ad){
+        int[] vis = new int[v];
+        int[] pathVis = new int[v];
+        for(int i=0;i<v;i++){
+            if(vis[i]==0){
+                if(detectCycleDFSHelper(i, vis, pathVis, ad)) return true;
+            }
+        }
+        return false;
+    }
+    public static boolean detectCycleDFSHelper(int node,int[] vis,int[] pathVis,ArrayList<ArrayList<Integer>> ad){
+        vis[node]=1;
+        pathVis[node]=1;
+        for(Integer it : ad.get(node)){
+            if(vis[it]==0){
+                if(detectCycleDFSHelper(it, vis, pathVis, ad)) return true;
+            }
+            else if(pathVis[it]==1) return true;
+        }
+        pathVis[node]=0;
+        return false;
+    }
+    public static List<Integer> safeStates(int v,ArrayList<ArrayList<Integer>> ad){
+        int[] vis = new int[v];
+        int[] pathVis = new int[v];
+        int[] check = new int[v];
+        List<Integer> res = new ArrayList<>();
+        for(int i=0;i<v;i++){
+            if(vis[i]==0) safeStatesHelper(i, vis, pathVis, check, res, ad);
+        }
+        for(int i=0;i<v;i++){
+            if(check[i]==1) res.add(i);
+        }
+        return res;
+    }
+    public static boolean safeStatesHelper(int node,int[] vis,int[] pathVis,int[] check,List<Integer> res,ArrayList<ArrayList<Integer>> ad){
+        vis[node]=1;
+        pathVis[node]=1;
+        check[node]=0;
+        for(Integer it : ad.get(node)){
+            if(vis[it]==0){
+                if(safeStatesHelper(it, vis, pathVis,check, res, ad)) return true;
+                //if(!res.contains(node))
+            }
+            else if(pathVis[it]==1){
+               // res.remove(node);
+                return true;
+            }
+        }
+        check[node]=1;
+        pathVis[node]=0;
+        return false;
+    }
+    public static List<Integer> topologicalSortDFS(int v,ArrayList<ArrayList<Integer>> ad){
+        int[] vis = new int[v];
+        Stack<Integer> st = new Stack<>();
+        for(int i=0;i<v;i++){
+            if(vis[i]==0) topologicalSortDFSHelper(i, vis, st, ad);
+        }
+        List<Integer> res = new ArrayList<>();
+        while (!st.isEmpty()) {
+            res.add(st.pop());
+        }
+        return res;
+
+    }
+    public static void topologicalSortDFSHelper(int node,int[] vis,Stack<Integer> st,ArrayList<ArrayList<Integer>> ad){
+        vis[node]=1;
+        for(Integer it : ad.get(node)){
+            if(vis[it]==0){
+                topologicalSortDFSHelper(it, vis, st, ad);
+            }
+        }
+        st.push(node);
+    }
+    public static List<Integer> topologicalSortBFS(int v,ArrayList<ArrayList<Integer>> ad){
+        int[] inDegree = new int[v];
+
+        Queue<Integer> q = new LinkedList<>();
+        List<Integer> res = new ArrayList<>();
+        //Queue<Integer> q = new LinkedList<>();
+        for(int i=0;i<v;i++){
+            for(Integer it : ad.get(i)){
+                inDegree[it]++;
+            }
+        }
+        for(int i=0;i<v;i++){
+            if(inDegree[i]==0) q.add(i);
+        }
+        while (!q.isEmpty()) {
+            int n = q.poll();
+            res.add(n);
+            for(Integer it : ad.get(n)){
+                inDegree[it]--;
+                if(inDegree[it]==0) q.add(it);
+            }
+        }
+        return res;
+    }
+    public static boolean cycleExist(int v,ArrayList<ArrayList<Integer>> ad){
+        List<Integer> topo = topologicalSortBFS(v, ad);
+        return v==topo.size() ? false : true;
+    }
+    public static boolean courseSchedule(int v,int[][] pre){
+        ArrayList<ArrayList<Integer>> ad = new ArrayList<>();
+        for(int i=0;i<v;i++){
+            ad.add(new ArrayList<>());
+        }
+        int m = pre.length;
+        for(int i=0;i<m;i++){
+            ad.get(pre[i][1]).add(pre[i][0]);
+        }
+        int[] inDegree = new int[v];
+        for(int i=0;i<v;i++){
+            for(Integer it : ad.get(i)){
+                inDegree[it]++;
+            }
+        }
+        Queue<Integer> q = new LinkedList<>();
+        for(int i=0;i<v;i++){
+            if(inDegree[i]==0) q.add(i);
+        }
+        List<Integer> topo = new ArrayList<>();
+        while (!q.isEmpty()) {
+            int node = q.poll();
+            topo.add(node);
+            for(Integer it : ad.get(node)){
+                inDegree[it]--;
+                if(inDegree[it]==0) q.offer(it);
+            }
+        }
+        return topo.size()==v ? true : false;
+    }
+    public static List<Integer> safeStatesBFS(int v,ArrayList<ArrayList<Integer>> ad){
+        ArrayList<ArrayList<Integer>> rev = new ArrayList<>();
+        for(int i=0;i<v;i++){
+            rev.add(new ArrayList<>());
+        }
+        int[] inDegree = new int[v];
+        for(int i=0;i<v;i++){
+            for(Integer it : ad.get(i)){
+                rev.get(it).add(i);
+                inDegree[i]++;
+            }
+        }
+        Queue<Integer> q = new LinkedList<>();
+        for(int i=0;i<v;i++){
+            if(inDegree[i]==0) q.offer(i);
+        }
+        List<Integer> safe = new ArrayList<>();
+        while (!q.isEmpty()) {
+            int n = q.poll();
+            safe.add(n);
+            for(Integer it : rev.get(n)){
+                inDegree[it]--;
+                if(inDegree[it]==0) q.offer(it);
+            }
+        }
+        return safe;
+    }
+    public static int alienDictonary(int n,int k,String[] dict){
+        ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
+        for(int i=0;i<k;i++) adj.add(new ArrayList<>());
+        for(int i=0;i<n-1;i++){
+            String s1 = dict[i];
+            String s2 = dict[i+1];
+           // System.out.println(s2);
+            int j=0;
+            while (j<s1.length() && j<s2.length()) {
+                //System.out.println(s1.charAt(j)+"   "+s2.charAt(j));
+                if(s1.charAt(j)!=s2.charAt(j)){
+                    adj.get(s1.charAt(j)-'a').add(s2.charAt(j)-'a');
+                    break;
+                }
+                j++;
+            }
+        }
+        List<Integer> res = topologicalSortBFS(k, adj);
+        return res.size()==k ? 1 : 0; 
+    }
+    // public static int[] shortestPath(int n,int m,ArrayList<ArrayList<Integer>> adj){
+        
+    //     int[] dist = new int[n];
+    //     Arrays.fill(dist, -1);
+    //     dist[0]=0;
+    //     int[] inDegree = new int[n];
+    //     for(int i=0;i<m;i++){
+    //         inDegree[adj.get(i).get(1)]++;
+    //     }
+    //     for(int i : inDegree) System.out.print(i+" ");
+    //     //System.out.println();
+    //     Queue<Pair> q = new LinkedList<>();
+    //     for(int i=0;i<n;i++){
+    //         if(inDegree[i]==0) q.offer(new Pair(adj.get(i).get(1), adj.get(i).get(0), adj.get(i).get(2)));
+    //     }
+    //     System.out.println(q.peek().toString());
+    //     while (!q.isEmpty()) {
+    //         int node = q.peek().first;
+    //         int parent = q.peek().second;
+    //         int len = q.peek().time;
+    //         q.poll();
+    //         for(int i=0;i<m;i++){
+    //             if(adj.get(i).get(1)==node && dist[node]==-1){
+    //                 dist[node] = dist[parent] + len; 
+    //                 inDegree[node]--;
+    //                 if(inDegree[node]==0){
+
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return dist;
+
+    // }
     public static void main(String[] args) {
-        // int v = 5;
-        // ArrayList<ArrayList<Integer>> adj = new ArrayList<>();
-        // for (int i = 0; i < v; i++) {
-        //     adj.add(new ArrayList<>());
-        // }
-        // adj.get(0).add(1);
-        // // adj.get(0).add(4);
-        // // adj.get(1).add(0);
-        // // adj.get(1).add(2);
-        // // adj.get(1).add(3);
-        // // adj.get(2).add(1);
-        // // adj.get(3).add(1);
-        // // adj.get(4).add(0);
-        // // System.out.println(bfsOfGraph(v,adj));
-        // // System.out.println(dfsOfGraph(v, adj));
+        ArrayList<ArrayList<Integer>> adj = new ArrayList<>(Arrays.asList(
+    new ArrayList<>(Arrays.asList(0, 1, 2)),
+    new ArrayList<>(Arrays.asList(0, 4, 1)),
+    new ArrayList<>(Arrays.asList(4, 5, 4)),
+    new ArrayList<>(Arrays.asList(4, 2, 2)),
+    new ArrayList<>(Arrays.asList(1, 2, 3)),
+    new ArrayList<>(Arrays.asList(2, 3, 6)),
+    new ArrayList<>(Arrays.asList(5, 3, 1))
+));
+        for(int i=0;i<7;i++) System.out.println(i+" "+adj.get(i));
+        //System.out.println(adj);
+       System.out.println(shortestPath(6, 7, adj));
+        // String[] a = {"baa","abcd","abca","cab","cad"};
+        // System.out.println(alienDictonary(5,4, a));
+//         int v = 7;
+//         ArrayList<ArrayList<Integer>> adj= new ArrayList<>();
+//         for (int i = 0; i < v; i++) {
+//             adj.add(new ArrayList<>());
+//         }
+// // adj.get(0).add(1);
+// adj.get(3).add(1);
+// adj.get(2).add(3);
+// //adj.get(3).add(1); // cycle
+// adj.get(4).add(0);
+// adj.get(4).add(1);
+// adj.get(5).add(0);
+// adj.get(5).add(2);
+//         for(int i=0;i<6;i++){
+//             System.out.println(i+" "+adj.get(i));
+//         }
+       // System.out.println(safeStates(v, adj));
+       //System.out.println(topologicalSortDFS(v, adj));
+       //System.out.println(topologicalSortBFS(6, adj));
+        // System.out.println(checkBipartiteBFS(4, adj1));
+        // System.out.println(checkBipartiteDFS(4, adj1));
+        //
+         // System.out.println(dfsOfGraph(v, adj));
         // // System.out.println(numberOfProvinces(v, adj));
 //         int[][] matrix = {
 //             {0, 1, 1, 0},
@@ -498,6 +777,7 @@ public class Demo {
 //     {0, 0, 0, 0}
 // };
 //         System.out.println(numberOfEnclaves(grid1));
+
 
     }
 }
