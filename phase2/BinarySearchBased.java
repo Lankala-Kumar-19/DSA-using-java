@@ -209,14 +209,14 @@ public class BinarySearchBased {
 
 
     public static void main(String[] args) {
-        int[] a = {1,2,3,5,6};
-        int[] b = {4,5,1,2,3};
-        int[] c = {3,6,7,11};
-        int[] d ={1,2,3,4,5,6,7,7,7,7,7,8,9,10};
-        int[] e = {1,2,3,1,1};
-        int[] f = {5,5,5,5};
-        int[] g = {1,2,3,4,3,2,1};
-        int[] h= {10,20,30,40};
+        // int[] a = {1,2,3,5,6};
+        // int[] b = {4,5,1,2,3};
+        // int[] c = {3,6,7,11};
+        // int[] d ={1,2,3,4,5,6,7,7,7,7,7,8,9,10};
+        // int[] e = {1,2,3,1,1};
+        // int[] f = {5,5,5,5};
+        // int[] g = {1,2,3,4,3,2,1};
+        // int[] h= {10,20,30,40};
         // System.out.println(search(a, 5));
         // System.out.println(searchInsert(a, 4));
         // printArray(searchRange(a, 2));

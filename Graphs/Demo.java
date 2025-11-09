@@ -4,15 +4,26 @@ import java.util.*;
 class Pair{
     int first,second;
     int time;
+    String sfirst;
+    Pair p;
     public Pair(int first,int second){
         this.first=first;
         this.second=second;
+    }
+    public Pair(int first,Pair p){
+        this.first=first;
+        this.p=p;
     }
     public Pair(int first,int second,int time){
         this.first=first;
         this.second=second;
         this.time=time;
     }
+    public Pair(String sfirst,int second){
+        this.sfirst=sfirst;
+        this.second=second;
+    }
+
     public String toString(){
         return "first: "+first+" second: "+second+" x: "+time;
     }
@@ -666,53 +677,432 @@ public class Demo {
         List<Integer> res = topologicalSortBFS(k, adj);
         return res.size()==k ? 1 : 0; 
     }
-    // public static int[] shortestPath(int n,int m,ArrayList<ArrayList<Integer>> adj){
-        
-    //     int[] dist = new int[n];
-    //     Arrays.fill(dist, -1);
-    //     dist[0]=0;
-    //     int[] inDegree = new int[n];
-    //     for(int i=0;i<m;i++){
-    //         inDegree[adj.get(i).get(1)]++;
+    public static void topoSortSP(int node,ArrayList<ArrayList<Pair>> adj,int[] vis,Stack<Integer> st){
+        vis[node]=1;
+        for(int i=0;i<adj.get(node).size();i++){
+            int v = adj.get(node).get(i).first;
+            if(vis[v]==0){
+                topoSortSP(v, adj, vis, st);
+            }
+        }
+        st.push(node);
+    }
+    public static int[] shortestPath(int n,int m,int[][] edge){  
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for(int i=0;i<n;i++){
+            adj.add(new ArrayList<Pair>());
+        }
+        for(int i=0;i<m;i++){
+            int u = edge[i][0];
+            int v = edge[i][1];
+            int wt = edge[i][2];
+            adj.get(u).add(new Pair(v, wt));
+        } 
+        int[] vis = new int[n];
+        Stack<Integer> st = new Stack<>();
+        for(int i=0;i<n;i++){
+            if(vis[i]==0){
+                topoSortSP(i, adj, vis, st);
+            }
+        } 
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[0]=0;
+        while (!st.isEmpty()) {
+            int node = st.peek();
+            st.pop();
+            for(int i=0;i<adj.get(node).size();i++){
+                int v = adj.get(node).get(i).first;
+                int wt = adj.get(node).get(i).second;
+                if(dist[node] + wt < dist[v]){
+                    dist[v] = dist[node] + wt;
+                }
+            }
+        }
+        for(int i=0;i<n;i++) if(dist[i]==Integer.MAX_VALUE) dist[i]=-1;
+        return dist;
+    }
+    // public static void topoSortSPU(int node,Stack<Integer> st,int[] vis,ArrayList<ArrayList<Pair>> adj){
+    //     vis[node]=1;
+    //     for(int i=0;i<adj.get(node).size();i++){
+    //         int v = adj.get(node).get(i).first;
+    //         if(vis[v]==0) topoSortSPU(v, st, vis, adj);
     //     }
-    //     for(int i : inDegree) System.out.print(i+" ");
-    //     //System.out.println();
-    //     Queue<Pair> q = new LinkedList<>();
-    //     for(int i=0;i<n;i++){
-    //         if(inDegree[i]==0) q.offer(new Pair(adj.get(i).get(1), adj.get(i).get(0), adj.get(i).get(2)));
-    //     }
-    //     System.out.println(q.peek().toString());
-    //     while (!q.isEmpty()) {
-    //         int node = q.peek().first;
-    //         int parent = q.peek().second;
-    //         int len = q.peek().time;
-    //         q.poll();
-    //         for(int i=0;i<m;i++){
-    //             if(adj.get(i).get(1)==node && dist[node]==-1){
-    //                 dist[node] = dist[parent] + len; 
-    //                 inDegree[node]--;
-    //                 if(inDegree[node]==0){
-
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return dist;
-
+    //     st.push(node);
     // }
+    public static int[] shortestPathUnit(int n,int m,int[][] edge){
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for(int i=0;i<n;i++) adj.add(new ArrayList<Pair>());
+        for(int i=0;i<m;i++){
+            int u = edge[i][0];
+            int v = edge[i][1];
+            adj.get(u).add(new Pair(v, 1));
+            adj.get(v).add(new Pair(u, 1));
+        }
+        int[] dist = new int[n];
+        int[] vis = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[0]=0;
+        Queue<Pair> q = new LinkedList<>();
+        q.offer(new Pair(0, 0));
+       // topoSortSPU(0, st, vis, adj);
+       vis[0]=1;
+        while (!q.isEmpty()) {
+            int node = q.peek().first;
+            q.poll();
+            for(int i=0;i<adj.get(node).size();i++){
+                int v = adj.get(node).get(i).first;
+               // System.out.println(node+" "+v+" "+dist[node]+" "+dist[v]);
+                if(vis[v]==0){
+                    vis[v]=1;
+                    dist[v] = dist[node] + 1;
+                    q.offer(new Pair(v, dist[v]));
+                }
+            }
+        }
+        for(int i=0;i<n;i++) if(dist[i]==Integer.MAX_VALUE) dist[i]=-1;
+        return dist;
+    }
+    public static int wordLadder(String beginWord,String endWord,String[] s){
+        Set<String> set = new HashSet<>();
+        for(String i : s) set.add(i);
+        Queue<Pair> q = new LinkedList<>();
+        q.offer(new Pair(beginWord, 1));
+        while (!q.isEmpty()) {
+            String x = q.peek().sfirst;
+            //System.out.println("---"+x.toString());
+            int lvl = q.peek().second;
+            if(x.toString().equals(endWord)) return lvl;
+            q.poll();
+            char[] word = x.toCharArray();
+            for(int i=0;i<x.length();i++){
+               // StringBuilder sb = new StringBuilder(x);
+                char old = word[i];
+                for(char c='a';c<='z';c++){
+                    if(old==c) continue;
+                    //sb.setCharAt(i, c);
+                    word[i]=c;
+                    String newword = new String(word);
+                   // System.out.println(sb.toString());
+                    if(set.contains(newword)){
+                       // System.out.println("****"+sb.toString());
+                        q.offer(new Pair(newword, lvl+1));
+                        set.remove(newword);
+                    }
+                }
+                word[i]=old;
+            }
+        }
+        return -1;
+    }
+    public static ArrayList<ArrayList<String>> wordLadderII(String beginWord,String endWord,String[] s){
+        Queue<ArrayList<String>> q = new LinkedList<>();
+        Set<String> set = new HashSet<>();
+        for(String i : s) set.add(i);
+        int lvl=1;
+        ArrayList<String> usedOnLevel = new ArrayList<>();
+        ArrayList<ArrayList<String>> ans = new ArrayList<>();
+        usedOnLevel.add(beginWord);
+        q.offer(usedOnLevel);
+        while (!q.isEmpty()) {
+            ArrayList<String> list = q.poll();
+            if(list.size()>lvl){
+                lvl=list.size();
+                for(String it : usedOnLevel) set.remove(it);
+                usedOnLevel.clear();
+            }
+            String word = list.get(list.size()-1);
+            if(word.equals(endWord)){
+                if(ans.isEmpty() || ans.get(0).size()==list.size()) ans.add(new ArrayList<>(list));
+              //  else if(ans.get(0).size()==list.size()) ans.add(list);
+            }
+            char[] x = word.toCharArray();
+            for(int i=0;i<word.length();i++){
+                char old = x[i];
+                for(char c ='a';c<='z';c++){
+                    if(old==c) continue;
+                    x[i]=c;
+                    String newString = new String(x);
+                    if(set.contains(newString)){
+                        list.add(newString);
+                        ArrayList<String> temp = new ArrayList<>(list);
+                        q.offer(temp);
+                        usedOnLevel.add(newString);
+                        list.remove(list.size()-1);
+                    }
+                }
+                x[i]=old;
+            }
+        }
+        return ans;
+    }
+    public static int[] dijkstraAlgo(int n,int[][] edge){
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for(int i=0;i<n;i++){
+            adj.add(new ArrayList<Pair>());
+        }
+        for(int i=0;i<edge.length;i++){
+            int u = edge[i][0];
+            int v = edge[i][1];
+            int wt = edge[i][2];
+            adj.get(u).add(new Pair( v,wt));
+            adj.get(v).add(new Pair(u, wt));
+        }
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[0]=0;
+        int[] vis = new int[n];
+
+        PriorityQueue<Pair> minHeap = new PriorityQueue<>((a,b)-> a.second - b.second);
+        minHeap.offer(new Pair(0, 0));
+        while (!minHeap.isEmpty()) {
+            int wt = minHeap.peek().second;
+            int node = minHeap.peek().first;
+            minHeap.poll();
+            if(vis[node]==1) continue;
+            vis[node]=1;
+            for(int i=0;i<adj.get(node).size();i++){
+                int v = adj.get(node).get(i).first;
+                int vwt = adj.get(node).get(i).second;
+                if(wt + vwt < dist[v]){
+                    dist[v]=vwt+wt;
+                    minHeap.offer(new Pair( v,dist[v]));
+                }
+                
+            }
+        }
+        for(int i=0;i<n;i++) if(dist[i]==Integer.MAX_VALUE) dist[i]=-1;
+        return dist; 
+    }
+    public static int[] dijkstraAlgoSet(int n,int[][] edge){
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for(int i=0;i<n;i++){
+            adj.add(new ArrayList<Pair>());
+        }
+        for(int i=0;i<edge.length;i++){
+            int u = edge[i][0];
+            int v = edge[i][1];
+            int wt = edge[i][2];
+            adj.get(u).add(new Pair( v,wt));
+            adj.get(v).add(new Pair(u, wt));
+        }
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[0]=0;
+        int[] vis = new int[n];
+
+        TreeSet<Pair> set = new TreeSet<>((a,b)-> (a.second==b.second) ? (a.first-b.first) : (a.second - b.second));
+        set.add(new Pair(0, 0));
+        while (!set.isEmpty()) {
+            Pair p = set.first();
+            int wt = p.second;
+            int node = p.first;
+            set.pollFirst();
+            if(vis[node]==1) continue;
+            vis[node]=1;
+            for(int i=0;i<adj.get(node).size();i++){
+                int v = adj.get(node).get(i).first;
+                int vwt = adj.get(node).get(i).second;
+                if(wt + vwt < dist[v]){
+                    set.remove(new Pair(v, dist[v]));
+                    dist[v]=vwt+wt;
+                    set.add(new Pair(v, dist[v]));
+                }
+                
+            }
+        }
+        for(int i=0;i<n;i++) if(dist[i]==Integer.MAX_VALUE) dist[i]=-1;
+        return dist; 
+    }
+    public static List<Integer> printShortestPath(int n,int[][] edges){
+        int[] dist = new int[n+1];
+        dist[1]=0;
+        int[] parent = new int[n+1];
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for(int i=0;i<n;i++) adj.add(new ArrayList<>());
+        for(int i=0;i<edges.length;i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            adj.get(u).add(new Pair(v, edges[i][2]));
+            adj.get(v).add(new Pair(u, edges[i][2]));
+        }
+        for(int i=0;i<=n;i++) parent[i]=i;
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a,b)-> a.second-b.second);
+        pq.offer(new Pair(1, 0));
+        while (!pq.isEmpty()) {
+            Pair p = pq.poll();
+            int node = p.first;
+            int dis = p.second;
+            for(Pair it : adj.get(node)){
+                int x = it.first;
+                int xdis = it.second; 
+                if(dis + xdis < dist[x]){
+                    dist[x]= xdis + dis;
+                    pq.offer(new Pair(x, dist[x]));
+                    parent[x]=node;
+                }
+            }
+        }
+        List<Integer> path = new ArrayList<>();
+        if(dist[n]==Integer.MAX_VALUE) return path;
+        int node = n;
+        while (parent[node]!=node) {
+            path.add(node);
+            node=parent[node];
+        }
+        path.add(1);
+        Collections.reverse(path);
+        return path;
+    }
+    public static int shortestDistanceInAMaze(int[] src,int[] dest,int[][] grid){
+        if(src[0]==dest[0] && dest[1]==src[1]) return 0;
+        int n = grid.length;
+        int m = grid[0].length;
+      //  ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        int[][] dist = new int[n][m];
+        for(int[] i : dist) Arrays.fill(i, Integer.MAX_VALUE);
+        dist[src[0]][src[1]] = 0;
+        Queue<Pair> q = new LinkedList<>();
+        q.add(new Pair(0,src[0],src[1]));
+        int[] dr = {-1,0,1,0};
+        int[] dc = {0,1,0,-1};
+        while (!q.isEmpty()) {
+            Pair p = q.poll();
+            int dis = p.first;
+            int r = p.second;
+            int c = p.time;
+            for(int i=0;i<4;i++){
+                int nrow = r + dr[i];
+                int ncol = c + dc[i];
+                if(nrow>=0 && nrow<n && ncol>=0 && ncol<m && grid[nrow][ncol]==1 && dis+1< dist[nrow][ncol]){
+                    dist[nrow][ncol] = 1 + dis;
+                    if(nrow==dest[0] && ncol==dest[1]) return dist[nrow][ncol];
+                    q.offer(new Pair(dis+1, nrow, ncol));
+                }
+            }
+        }
+        return -1;
+    }
+    public static int pathWithMinEffort(int[][] grid){
+        int n =grid.length;
+        int m = grid[0].length;
+        int[][] dist = new int[n][m];
+        for(int[] i : dist) Arrays.fill(i, Integer.MAX_VALUE);
+        dist[0][0] =0;
+        //int[] x = new int[3];
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)-> a[0]-b[0]);
+        pq.offer(new int[]{0,0,0});
+        int[] dr = {-1,0,1,0};
+        int[] dc = {0,1,0,-1};
+        while (!pq.isEmpty()) {
+            int[] x = pq.poll();
+            int effort = x[0];
+            int r = x[1];
+            int c = x[2];
+            if(r==n-1 && c==m-1) return effort;
+            for(int i=0;i<4;i++){
+                int nrow = r + dr[i];
+                int ncol = c + dc[i];
+                if(nrow>=0 && nrow<n && ncol>=0 && ncol<m && Math.max(Math.abs(grid[nrow][ncol] - grid[r][c]),effort) < dist[nrow][ncol]){
+                    dist[nrow][ncol] = Math.max((int)Math.abs(grid[nrow][ncol] - grid[r][c]),effort) ;
+                    pq.offer(new int[]{dist[nrow][ncol],nrow,ncol});
+                }
+            }
+        }
+        return -1;
+    }
+    public static int cheapestFlightsKStops(int n,int src,int dst,int k,int[][] routes){
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src]=0;
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for(int i=0;i<n;i++) adj.add(new ArrayList<>());
+        for(int i=0;i<n;i++){
+            int u = routes[i][0];
+            int v = routes[i][1];
+            int price = routes[i][2];
+            adj.get(u).add(new Pair(v, price));
+            //adj.get(v).add(new Pair(u, price));
+        }
+        Queue<int[]> q = new LinkedList<>();
+        //int[]{stops,node,price}
+        q.offer(new int[]{0,src,0});
+        while (!q.isEmpty()) {
+            int[] x = q.poll();
+            int stops = x[0];
+            int node = x[1];
+            int price = x[2];
+            if(stops>k) continue;
+            for(Pair p : adj.get(node)){
+                if( price + p.second < dist[p.first] && stops<=k){
+                    dist[p.first] = price + p.second;
+                    q.offer(new int[]{stops+1,p.first,dist[p.first]});
+                }
+            }
+        }
+        if(dist[dst]==Integer.MAX_VALUE) return -1;
+        return dist[dst];
+    }
+    
     public static void main(String[] args) {
-        ArrayList<ArrayList<Integer>> adj = new ArrayList<>(Arrays.asList(
-    new ArrayList<>(Arrays.asList(0, 1, 2)),
-    new ArrayList<>(Arrays.asList(0, 4, 1)),
-    new ArrayList<>(Arrays.asList(4, 5, 4)),
-    new ArrayList<>(Arrays.asList(4, 2, 2)),
-    new ArrayList<>(Arrays.asList(1, 2, 3)),
-    new ArrayList<>(Arrays.asList(2, 3, 6)),
-    new ArrayList<>(Arrays.asList(5, 3, 1))
-));
-        for(int i=0;i<7;i++) System.out.println(i+" "+adj.get(i));
+int n = 3;
+int[][] flights = {
+    {0, 1, 100},
+    {1, 2, 100},
+    {0, 2, 500}
+};
+int src = 0;
+int dst = 2;
+int k = 1;
+System.out.println(cheapestFlightsKStops(n, src, dst, k, flights));
+//         int[][] heights = {
+//     {1, 2, 2, 1},
+//     {3, 8, 2, 4},
+//     {5, 3, 5, 2},
+//     {2, 1, 2, 1}
+// };
+//         System.out.println(pathWithMinEffort(heights));
+        // String[] s = {"des","der","dfr","dgt","dfs"};
+        // System.out.println(wordLadderII("der", "dfs", s));
+
+//         ArrayList<ArrayList<Integer>> adj = new ArrayList<>(Arrays.asList(
+//     new ArrayList<>(Arrays.asList(0, 1, 2)),
+//     new ArrayList<>(Arrays.asList(0, 4, 1)),
+//     new ArrayList<>(Arrays.asList(4, 5, 4)),
+//     new ArrayList<>(Arrays.asList(4, 2, 2)),
+//     new ArrayList<>(Arrays.asList(1, 2, 3)),
+//     new ArrayList<>(Arrays.asList(2, 3, 6)),
+//     new ArrayList<>(Arrays.asList(5, 3, 1))
+// ));
+// int[][] adj = {
+//     {0, 1, 2},
+//     {0, 4, 1},
+//     {4, 5, 4},
+//     {4, 2, 2},
+//     {1, 2, 3},
+//     {2, 3, 6},
+//     {5, 3, 1}
+// };
+//     int[] x = (dijkstraAlgoSet(7, adj));
+//     int[] y = shortestPath(7, adj.length, adj);
+//     for(int i : x) System.out.print(i+" ");
+//     System.out.println();
+//     for(int i : y) System.out.print(i+" ");
+//         int[][] edges = {
+//     {0, 1},
+//     {0, 3},
+//     {1, 2},
+//     {3, 4},
+//     {4, 5},
+//     {5, 6},
+//     {2, 6}
+// };
+        //for(int i=0;i<7;i++) System.out.println(i+" "+adj.get(i));
+        // int[] x = (shortestPathUnit(7, edges.length,edges ));
+        // for(int i : x) System.out.print(i+" ");
         //System.out.println(adj);
-       System.out.println(shortestPath(6, 7, adj));
+      // System.out.println(shortestPath(6, 7, adj));
         // String[] a = {"baa","abcd","abca","cab","cad"};
         // System.out.println(alienDictonary(5,4, a));
 //         int v = 7;
