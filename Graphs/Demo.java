@@ -29,6 +29,17 @@ class Pair{
     }
 
 }
+class Edge implements Comparable<Edge>{
+    int src,dest,weight;
+    public Edge(int src,int dest,int weight){
+        this.src=src;
+        this.dest=dest;
+        this.weight=weight;
+    }
+    public int compareTo(Edge compareEdge){
+        return this.weight - compareEdge.weight;
+    }
+};
 public class Demo {
     public static ArrayList<Integer> bfsOfGraph(int v,ArrayList<ArrayList<Integer>> ad){
         boolean[] vis = new boolean[v];
@@ -1044,18 +1055,281 @@ public class Demo {
         if(dist[dst]==Integer.MAX_VALUE) return -1;
         return dist[dst];
     }
-    
+    public static int minMultiplications(int st,int end,int[] arr){
+        //int[] {val,steps}
+        Queue<int[]> q = new LinkedList<>();
+        q.offer(new int[]{st,0});
+        int[] dist = new int[100000];
+        Arrays.fill(dist,Integer.MAX_VALUE);
+        dist[st]=0;
+        while (!q.isEmpty()) {
+            int[] x = q.poll();
+            // if(x[0]>end) continue; 
+            int val = x[0];
+            int steps = x[1];
+           // if(val>end) continue;
+            //if(val==end) return steps;
+            for(int i=0;i<arr.length;i++){
+                int z = (val*arr[i])%100000;
+                if(steps + 1 < dist[z]){
+                    dist[z]=steps + 1;
+                    if(z==end) return steps+1;
+                    q.offer(new int[]{z,steps+1});
+                }
+                
+            }
+        }
+       // if(dist[end]==Integer.MAX_VALUE)
+        return -1;
+        //return dist[end];
+    }
+    public static int numOfWaysToArriveAtDest(int n,int m,int[][] edges){
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for(int i=0;i<n;i++) adj.add(new ArrayList<>());
+        for(int i=0;i<m;i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            int time = edges[i][2];
+            adj.get(u).add(new Pair(v, time));
+            adj.get(v).add(new Pair(u, time));
+        }
+        int[] dist = new int[n];
+        Arrays.fill(dist,Integer.MAX_VALUE);
+        dist[0]=0;
+        //int sDist = Integer.MAX_VALUE;
+        //int[] {v,time}
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)-> a[1]-b[1]);
+        pq.offer(new int[]{0,0});
+        int[] way = new int[n];
+        way[0] = 1;
+        while (!pq.isEmpty()) {
+            int[] x = pq.poll();
+            int ad = x[0];
+            int time = x[1];
+            if(time > dist[ad]) continue;
+            for(Pair p : adj.get(ad)){
+                int node = p.first;
+                int ntime = p.second;
+                if(time + ntime < dist[node]){
+                    dist[node]=time+ntime;
+                    way[node] = way[ad];
+                    //System.out.println(node+" "+dist[node]);
+                    pq.offer(new int[]{node,dist[node]});
+                }
+                else if(dist[node]==time+ntime){
+                    way[node] = (way[node] + way[ad]) % 1000000007;
+                }
+            }
+        }
+        
+        return way[n-1];
+    }
+    public static int[] bellmanFord(int V,ArrayList<ArrayList<Integer>> edges,int s){
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[s]=0;
+        for(int i=0;i<V-1;i++){
+            for(ArrayList<Integer> it : edges){
+                int u = it.get(0);
+                int v = it.get(1);
+                int wt = it.get(2);
+                if(dist[u]!=Integer.MAX_VALUE && dist[u] + wt < dist[v]){
+                    dist[v] = dist[u] + wt;
+                }
+            }
+        }
+        for(ArrayList<Integer> it : edges){
+            int u = it.get(0);
+            int v = it.get(1);
+            int wt = it.get(2);
+            if(dist[u]!=Integer.MAX_VALUE && dist[u]+wt < dist[v]){
+                int temp[] = new int[1];
+                temp[0] = -1;
+                return temp;
+            }
+        }
+        return dist;
+    }
+    public static void floydWarshall(int[][] matrix){
+        int n = matrix.length;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<matrix.length;j++){
+                if(matrix[i][j]==-1){
+                    matrix[i][j] = Integer.MAX_VALUE;
+                }
+                if(i==j) matrix[i][j]=0;
+            }
+        }
+        for(int k =0; k<n;k++){
+            for(int i=0;i<n;i++){
+                for(int j=0;j<n;j++){
+                    if(matrix[i][k]!=Integer.MAX_VALUE && matrix[k][j]!=Integer.MAX_VALUE)
+                    matrix[i][j] = Math.min(matrix[i][j], matrix[i][k] + matrix[k][j]);
+                }
+            }
+        }
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]==Integer.MAX_VALUE) matrix[i][j]=-1;
+            }
+        }
+    }
+    public static int findSmallestNumOfNeighbours(int thres,int[][] cities){
+        int n =cities.length;
+        int m = cities[0].length;
+        int cntMax = n,city=-1;
+       // int[][] cost = new int[n][m];
+        floydWarshall(cities);
+        for(int i=0;i<n;i++){
+            int cnt=0;
+            for(int j=0;j<m;j++){
+                if(i!=j && cities[i][j]!=-1 && cities[i][j]<=thres){
+                    cnt++;
+                }
+            }
+            if(cnt<=cntMax){
+                cntMax=cnt;
+                city=i;
+            }
+        }
+        return city;
+    }
+    public static int primsAlgoMinSpanningTree(int V,ArrayList<ArrayList<ArrayList<Integer>>> adj){
+        int[] vis = new int[V];
+        //int[]{wt,node}
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)-> a[0]-b[0]);
+        pq.offer(new int[]{0,0});
+       // vis[0]=1;
+        int sum=0;
+        while(!pq.isEmpty()){
+            int[] x = pq.poll();
+            int node = x[1];
+            int wt = x[0];
+            if(vis[node]==1) continue;
+            vis[node]=1;
+            sum+=wt;
+            for(int i=0;i<adj.get(node).size();i++){
+                int ewt = adj.get(node).get(i).get(1);
+                int adjnode = adj.get(node).get(i).get(0);
+                if(vis[adjnode]==0){
+                    pq.offer(new int[]{ewt,adjnode});
+                }
+            }
+        }
+        return sum;
+    }
+    public static int kruskalsAlgoMinSpanningTree(int V,ArrayList<ArrayList<ArrayList<Integer>>> adj){
+        List<Edge> edges = new ArrayList<Edge>();
+        for(int i=0;i<V;i++){
+            for(int j=0;j<adj.get(i).size();j++){
+                int adjNode = adj.get(i).get(j).get(0);
+                int wt = adj.get(i).get(j).get(1);
+                if(i<adjNode)
+                edges.add(new Edge(i, adjNode, wt));
+            }
+        }
+        Disjoint ds = new Disjoint(V);
+        Collections.sort(edges);
+        int mstWt = 0;
+        for(int i=0;i<edges.size();i++){
+            int wt = edges.get(i).weight;
+            int u = edges.get(i).src;
+            int v = edges.get(i).dest;
+
+            if(ds.findUParent(u)!=ds.findUParent(v)){
+                mstWt+=wt;
+                ds.unionBySize(u, v);
+            }
+        }
+        return mstWt;
+    }
+    public static int findProvincesDisjoint(int V,ArrayList<ArrayList<Integer>> adj){
+        Disjoint ds = new Disjoint(V);
+        for(int i=0;i<V;i++){
+            for(int j=0;j<V;j++){
+                if(adj.get(i).get(j)==1) ds.unionByRank(i, j);
+            }
+        }
+        int cnt=0;
+        for(int i=0;i<V;i++){
+            if(ds.findUParent(i)==i) cnt++;
+        }
+        return cnt; 
+    }
+    public static int numberOfOperationstoMakeNewConnections(int V,ArrayList<ArrayList<Integer>> adj){
+        Disjoint ds = new Disjoint(V);
+        int e=0;
+        for(int i=0;i<adj.size();i++){
+            int u = adj.get(i).get(0);
+            int v = adj.get(i).get(1);
+            if(ds.findUParent(u)==ds.findUParent(v)) e++;
+            else ds.unionBySize(u, v);
+        }
+        int cnt=0;
+        for(int i=0;i<V;i++){
+            if(ds.findUParent(i)==i) cnt++;
+        }
+        if(e>=cnt-1)
+        return cnt-1;
+        return -1;
+    }
+    public static List<List<String>> accountsMerge(int n,ArrayList<ArrayList<String>> details){
+        Disjoint ds = new Disjoint(n);
+        Map<String,Integer> map = new HashMap<>();
+        for(int i=0;i<n;i++){
+            for(int j=1;j<details.get(i).size();j++){
+                String mail = details.get(i).get(j);
+                if(!map.containsKey(mail)) map.put(mail, i);
+                else ds.unionBySize(i, map.get(mail));
+            }    
+        }
+        ArrayList<String>[] merged = new ArrayList[n];
+        for(int i=0;i<n;i++) merged[i]=new ArrayList<>();
+
+        for(Map.Entry<String,Integer> it : map.entrySet()){
+            String mail = it.getKey();
+            int node = ds.findUParent(it.getValue());
+            merged[node].add(mail);
+        }
+        List<List<String>> ans = new ArrayList<>();
+        for(int i=0;i<n;i++){
+            if(merged[i].size()==0) continue;
+            Collections.sort(merged[i]);
+            List<String> temp = new ArrayList<>();
+            temp.add(details.get(i).get(0));
+            for(String s : merged[i]) temp.add(s);
+            ans.add(temp);
+        }
+        return ans;
+    }
+    public static void numberOfIslandsII(int n,ArrayList<ArrayList<Integer>> islands){
+        
+
+    }
     public static void main(String[] args) {
-int n = 3;
-int[][] flights = {
-    {0, 1, 100},
-    {1, 2, 100},
-    {0, 2, 500}
+        int n = 5;
+int[][] roads = {
+    {0,1,2},
+    {0,2,3},
+    {1,2,2},
+    {1,3,4},
+    {2,3,1},
+    {3,4,1}
 };
-int src = 0;
-int dst = 2;
-int k = 1;
-System.out.println(cheapestFlightsKStops(n, src, dst, k, flights));
+System.out.println(numOfWaysToArriveAtDest(n, roads[0].length, roads));
+        // int[] arr = {3,10,20};
+        // System.out.println(minMultiplications(1, 99999, arr));
+// int n = 3;
+
+// int[][] flights = {
+//     {0, 1, 100},
+//     {1, 2, 100},
+//     {0, 2, 500}
+// };
+// int src = 0;
+// int dst = 2;
+// int k = 1;
+// System.out.println(cheapestFlightsKStops(n, src, dst, k, flights));
 //         int[][] heights = {
 //     {1, 2, 2, 1},
 //     {3, 8, 2, 4},
@@ -1075,15 +1349,15 @@ System.out.println(cheapestFlightsKStops(n, src, dst, k, flights));
 //     new ArrayList<>(Arrays.asList(2, 3, 6)),
 //     new ArrayList<>(Arrays.asList(5, 3, 1))
 // ));
-// int[][] adj = {
-//     {0, 1, 2},
-//     {0, 4, 1},
-//     {4, 5, 4},
-//     {4, 2, 2},
-//     {1, 2, 3},
-//     {2, 3, 6},
-//     {5, 3, 1}
-// };
+int[][] adj = {
+    {0, 1, 2},
+    {0, 4, 1},
+    {4, 5, 4},
+    {4, 2, 2},
+    {1, 2, 3},
+    {2, 3, 6},
+    {5, 3, 1}
+};
 //     int[] x = (dijkstraAlgoSet(7, adj));
 //     int[] y = shortestPath(7, adj.length, adj);
 //     for(int i : x) System.out.print(i+" ");
