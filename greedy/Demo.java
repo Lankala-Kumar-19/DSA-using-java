@@ -1,7 +1,14 @@
 package greedy;
 
-import java.util.Arrays;
-
+import java.util.*;
+class Meeting{
+    int st,end,val;
+    public Meeting(int st,int end,int val){
+        this.st=st;
+        this.end=end;
+        this.val=val;
+    }
+}
 public class Demo {
     public static int assignCookies(int[] greed,int[] s){
         Arrays.sort(greed);
@@ -70,13 +77,140 @@ public class Demo {
         }
         return z/x.length;
     }
-    
+    public static boolean jumpGame(int[] x){
+        if(x.length==1) return true;
+        int maxJump=0;
+        for(int i=0;i<x.length;i++){
+            if(i>maxJump) return false;
+            int jump = i + x[i];
+            maxJump = Math.max(maxJump, jump);
+        }
+        return maxJump>=x.length;
+    }
+    public static int jumpGameII(int[] x){
+        return jump(0, 0, x);
+    }
+    public static int jump(int idx,int j,int[] x){
+        if(idx>=x.length) return j;
+        int min = Integer.MAX_VALUE;
+        for(int i=1;i<=x[idx];i++){
+            min = Math.min(min,jump(idx+i, j+1, x));
+        }
+        return min;
+    }
+    public static int jobSequencing(int[][] jobs){
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b)->{
+            // b[1] profits
+            int cmp = Integer.compare(b[1], a[1]);
+            if(cmp!=0) return cmp;
+            //b[0] deadlines
+            return Integer.compare(a[0], b[0]);
+        });
+        int days=0;
+        for(int[] i : jobs){
+            pq.offer(new int[]{i[1],i[2]});
+            days=Math.max(days, i[1]);
+        }
+        System.out.println(days);
+        int[] dl= new int[days+1];
+        int max=0;
+        while (!pq.isEmpty()) {
+            int[] x = pq.poll();
+           System.out.println(x[0]+"   "+x[1]);
+            for(int j=x[0];j>=1;j--){
+                if(dl[j]==0){
+                    dl[j]=1;
+                    max+=x[1];
+                    break;
+                }
+            }
+        }
+        return max;
+    }
+    public static int NMeetings(int[] st,int[] end){
+        if(st==null || st.length==0) return 0;
+        PriorityQueue<Meeting> q = new PriorityQueue<>((a,b)-> a.end - b.end);
+        for(int i=0;i<st.length;i++){
+            q.offer(new Meeting(st[i], end[i], i+1));
+        }
+        //Arrays.sort(end);
+        int cnt=1;
+        Meeting z = q.poll();
+        int free = z.end;
+        while (!q.isEmpty()) {
+            Meeting m = q.poll();
+            if(free>m.st) continue;
+            cnt++;
+            free = m.end;
+        }
+        return cnt;
+    }
+    public static int nonOverlappingIntervals(int[][] intervals){
+        if(intervals == null || intervals.length == 0) return 0;
+        Arrays.sort(intervals,(a,b)-> Integer.compare(a[1], b[1]));
+        int free = intervals[0][1];
+        int cnt=0;
+        for(int i=1;i<intervals.length;i++){
+            if(free>intervals[i][0]){
+                cnt++;
+                continue;
+            }
+            free=intervals[i][1];
+        }
+        return cnt;
+    }
+    public static List<int[]> insertIntervals(int[][] intervals,int[] newInterval){
+        List<int[]> res = new ArrayList<>();
+        int x=0;
+        int n=intervals.length;
+        while (x<n && intervals[x][1]<newInterval[0]) {
+            res.add(intervals[x]);
+            x++;
+        }
+        int st = newInterval[0];
+       
+        //st = Math.min(st, intervals[x][0]);
+        int end = newInterval[1];
+        while(x<n && intervals[x][0]<=end){
+            st = Math.min(st, intervals[x][0]);
+            end = Math.max(end, intervals[x][1]);
+            x++;
+        }
+        res.add(new int[]{st,end});
+        while (x<n) {
+            res.add(intervals[x]);
+            x++;
+        }
+        for(int[] i : res){
+            for(int j : i) System.out.print(j+" ");
+            System.out.println();
+        }
+        return res;
+    }
     public static void main(String[] args) {
-        int[] greed = {1,5,3,3,4};
-        int[] s = {4,2,1,2,1,3};
-        int[] b = {5,10,5,20,5,10,5};
-        int[] a = {4,3,7,1,2};
-        System.out.println(SJF(a));
+// int[] start = {1, 2, 3, 0};
+// int[] end   = {3, 4, 5, 6};
+int[][] intervals = {
+    {2,3},{5,7},{8,10}
+};
+        insertIntervals(intervals, new int[]{1,11});
+//         System.out.println(nonOverlappingIntervals(intervals));
+       // System.out.println(NMeetings(start, end));
+        // int[] greed = {1,5,3,3,4};
+        // int[] s = {4,2,1,2,1,3};
+        // int[] b = {5,10,5,20,5,10,5};
+        // int[] a = {4,3,7,1,2};
+        // int[] c = {2,5,0,0};
+        // System.out.println(jumpGameII(c));
+//         int[][] jobs = {
+//     {1, 2, 100}, // {jobId, deadline, profit}
+//     {2, 1, 19},
+//     {3, 2, 27},
+//     {4, 1, 25},
+//     {5, 3, 15}
+// };
+        // System.out.println(jobSequencing(jobs));
+        // System.out.println(SJF(a));
         //System.out.println(lemonadeChange(b));
         //System.out.println(assignCookies(greed, s));
     }
