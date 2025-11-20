@@ -127,6 +127,7 @@ public class BinarySearchBased {
         return q;
 
     }
+    
     public static int peakIndexInMountainArray(int[] arr){
         int low=0,high=arr.length-1;
         while(low<high){
@@ -140,6 +141,7 @@ public class BinarySearchBased {
         }
         return low-1;
     }
+    
     public static int firstBadVersion(int n){
         int low=1,high=n;
         while(low<=high){
@@ -164,7 +166,6 @@ public class BinarySearchBased {
         return low;
     }
 
-
     public static int lowerBound(int[] arr, int target){
         int low=0,high=arr.length-1;
         while(low<high){
@@ -174,6 +175,7 @@ public class BinarySearchBased {
         }
         return low;
     }
+    
     public static int allocateBooks(int[] pages, int students){
         if(students>pages.length) return -1;
         int low=0,high=pages.length-1;
@@ -203,8 +205,6 @@ public class BinarySearchBased {
         }
         return Arrays.stream(z).max().getAsInt();
     }
-
-
 
 
 

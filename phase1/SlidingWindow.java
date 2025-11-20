@@ -203,9 +203,10 @@ public class SlidingWindow {
                     deque.pollLast();
             }
             deque.offerLast(i);
-            //System.out.println(deque);
+            System.out.println(deque+"****");
             if(i>=k-1){
                 System.out.println(deque);
+                System.out.println(nums[deque.peekFirst()]);
                 list.add(nums[deque.peekFirst()]);
             }
         }

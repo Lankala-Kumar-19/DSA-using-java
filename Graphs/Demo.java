@@ -1302,10 +1302,6 @@ public class Demo {
         }
         return ans;
     }
-    public static void numberOfIslandsII(int n,ArrayList<ArrayList<Integer>> islands){
-        
-
-    }
     public static void main(String[] args) {
         int n = 5;
 int[][] roads = {
@@ -1412,11 +1408,11 @@ int[][] adj = {
 //             {1, 1, 0, 1}
 //         };
 //         //System.out.println(numberOfIslands(matrix));
-//         int[][] image = {
-//             {0, 0, 0},
-//             {0, 1, 0},
-//             {1, 0, 1}
-//         };
+        int[][] image = {
+            {0, 0, 0},
+            {0, 1, 0},
+            {1, 0, 1}
+        };
 //         // printGrid(image);
 //         // floodFill(1, 1, 2, image);
 //         // System.out.println();
@@ -1429,7 +1425,7 @@ int[][] adj = {
 //         };
 //         printGrid(image);
 //         System.out.println();
-//         printGrid(distanceOfnearestCell(image));
+       printGrid(distanceOfnearestCell(image));
 //        // System.out.println(rottenOranges(2, 1, grid));
 //         //System.out.println();
 //         //printGrid(grid);

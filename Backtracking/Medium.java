@@ -210,15 +210,15 @@ public class Medium {
     {'.','.','.','4','1','9','.','.','5'},
     {'.','.','.','.','8','.','.','7','9'}
 };
-        // sudokoSolver(board);
-        // display(board);
+        sudokoSolver(board);
+        display(board);
         //System.out.println(palindromePartitioning("aab"));
-        int[][] maze1 = {
-    {1, 0, 0, 0},
-    {1, 1, 0, 1},
-    {0, 1, 0, 0},
-    {1, 1, 1, 1}
-};
-    System.out.println(findPaths(maze1));
+//         int[][] maze1 = {
+//     {1, 0, 0, 0},
+//     {1, 1, 0, 1},
+//     {0, 1, 0, 0},
+//     {1, 1, 1, 1}
+// };
+//     System.out.println(findPaths(maze1));
     }
 }

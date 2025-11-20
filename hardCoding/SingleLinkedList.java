@@ -9,7 +9,6 @@
 //         this.data=data;
 //         this.next=null;
 //     }
-
 // }
 
 // public class SingleLinkedList {
