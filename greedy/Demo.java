@@ -187,13 +187,63 @@ public class Demo {
         }
         return res;
     }
+    public static int minNoOfPlatforms(int[] arr,int[] dep){
+        int n = arr.length;
+        Arrays.sort(arr);
+        Arrays.sort(dep);
+        int cnt=0,max=0;
+        int i=0,j=0;
+        while (i<n && j<n) {
+            if(arr[i]<=dep[j]){
+                cnt++;
+                i++;
+            }
+            else{
+                cnt--;
+                j++;
+            }
+            max = Math.max(max, cnt);
+        }
+        return max;
+        // int[][] x = new int[n][2];
+        // for(int i=0;i<n;i++){
+        //     x[i] = new int[]{arr[i],dep[i]};
+        // }
+        // Arrays.sort(x,(a,b)-> Integer.compare(a[0],b[0]));
+        // for(int[] i : x){
+        //     for(int j : i) System.out.print(j+" ");
+        //     System.out.println();
+        // }
+        // Queue<int[]> q = new LinkedList<>();
+        // q.offer(x[0]);
+        // int cnt=1;
+        // int free = x[0][1];
+        // for(int i=1;i<n;i++){
+        //     System.out.println(free+" "+x[i][0]);
+        //     if(free<x[i][0]){
+        //         free = x[i][1];
+        //         q.poll();
+        //         q.offer(x[i]);
+        //     }
+        //     else{
+        //         q.offer(x[i]);
+        //         free = Math.min(free,x[i][1]);
+        //         cnt=Math.max(cnt, q.size());
+        //     }
+        // }
+        // return cnt;
+    }
     public static void main(String[] args) {
+
+        int[] a = {900,945,955,1100,1500,1800};
+        int[] b = {920,1200,1130,1150,1900,2000};
+        System.out.println(minNoOfPlatforms(a, b));
 // int[] start = {1, 2, 3, 0};
 // int[] end   = {3, 4, 5, 6};
-int[][] intervals = {
-    {2,3},{5,7},{8,10}
-};
-        insertIntervals(intervals, new int[]{1,11});
+// int[][] intervals = {
+//     {2,3},{5,7},{8,10}
+// };
+        //insertIntervals(intervals, new int[]{1,11});
 //         System.out.println(nonOverlappingIntervals(intervals));
        // System.out.println(NMeetings(start, end));
         // int[] greed = {1,5,3,3,4};
