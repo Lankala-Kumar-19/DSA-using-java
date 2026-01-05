@@ -233,6 +233,8 @@ public class Demo {
         // }
         // return cnt;
     }
+    
+
     public static void main(String[] args) {
 
         int[] a = {900,945,955,1100,1500,1800};
