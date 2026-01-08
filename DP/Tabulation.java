@@ -420,8 +420,221 @@ public class Tabulation {
         }
         return prev[m];        
     }
+    public static String longestCommonSubseqPrint(String s1, String s2){
+        int n = s1.length();
+        int m = s2.length();
+        // int[] prev = new int[m+1];
+        // int[] cur = new int[m+1];
+        int[][] dp = new int[n+1][m+1];
+        for(int i=0;i<n;i++) dp[i][0]=0;
+        for(int j=0;j<m;j++) dp[0][j]=0;
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                // System.out.println(i+" "+j);
+                if(s1.charAt(i-1)==s2.charAt(j-1)) dp[i][j] = 1 + dp[i-1][j-1];
+                else dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }  
+          //  prev = cur; 
+        }
+        int i=n,j=m;
+        StringBuilder sb = new StringBuilder();
+        while(i>0 && j>0){
+            if(s1.charAt(i-1)==s2.charAt(j-1)){
+                sb.append(s1.charAt(i-1));
+               // System.out.println("**");
+                i--;
+                j--;
+            }
+            else if(dp[i][j-1]>dp[i-1][j]) j--;
+            else i--;
+        }   
+
+        return sb.reverse().toString();    
+    }
+    public static int longestCommonSubstring(String s1,String s2){
+        int n = s1.length();
+        int m = s2.length();
+        int max=0;
+        int[][] dp = new int[n+1][m+1];
+        for(int i=0;i<n;i++) dp[i][0]=0;
+        for(int j=0;j<m;j++) dp[0][j]=0;
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                if(s1.charAt(i-1)==s2.charAt(j-1)){
+                    dp[i][j] = 1 + dp[i-1][j-1];
+                    max = Math.max(max, dp[i][j]);
+                }
+                else dp[i][j] = 0;
+            }
+        }
+
+        // System.out.println("  a b z d");
+        // for(int[] i: dp){
+        //     for(int j : i) System.out.print(j+" ");
+        //     System.out.println();
+        // }
+        return max;
+    }
+    public static int longestPalindromicSubseq(String s){
+        StringBuilder sb = new StringBuilder(s);
+        String s2 = sb.reverse().toString();
+        int n = s.length();
+        int[][] dp = new int[n+1][n+1];
+        for(int i=0;i<=n;i++){
+            dp[i][0]=0;
+            dp[0][i]=0;
+        }
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=n;j++){
+                if(s.charAt(i-1)==s2.charAt(j-1)) dp[i][j] = 1 + dp[i-1][j-1];
+                else dp[i][j] = Math.max(dp[i][j-1], dp[i-1][j]);
+            }
+        }
+        return dp[n][n];
+       // return longestCommonSubseqPrint(s, sb.reverse().toString());
+    }
+    // public static int longestPalindromicSubseq(String s){
+    //     StringBuilder sb = new StringBuilder(s);
+    //     String s2 = sb.reverse().toString();
+    //     int n = s.length();
+    //     int[][] dp = new int[n+1][n+1];
+    //     for(int i=0;i<=n;i++){
+    //         dp[i][0]=0;
+    //         dp[0][i]=0;
+    //     }
+    //     for(int i=1;i<=n;i++){
+    //         for(int j=1;j<=n;j++){
+    //             if(s.charAt(i-1)==s2.charAt(j-1)) dp[i][j] = 1 + dp[i-1][j-1];
+    //             else dp[i][j] = Math.max(dp[i][j-1], dp[i-1][j]);
+    //         }
+    //     }
+    //     return dp[n][n];
+    //    // return longestCommonSubseqPrint(s, sb.reverse().toString());
+    // }
+    public static String longestPalindromicSubseqPrint(String s){
+        StringBuilder sb = new StringBuilder(s);
+        String s2 = sb.reverse().toString();
+        int n = s.length();
+        int[][] dp = new int[n+1][n+1];
+        for(int i=0;i<=n;i++){
+            dp[i][0]=0;
+            dp[0][i]=0;
+        }
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=n;j++){
+                if(s.charAt(i-1)==s2.charAt(j-1)) dp[i][j] = 1 + dp[i-1][j-1];
+                else dp[i][j] = Math.max(dp[i][j-1], dp[i-1][j]);
+            }
+        }
+        int x = dp[n][n];
+        int i=n,j=n;
+        StringBuilder sb1 = new StringBuilder();
+        while (i>0 && j>0) {
+            if(s.charAt(i-1)==s2.charAt(j-1)){
+                sb1.append(s.charAt(i-1));
+                i--;
+                j--;
+            }
+            else if(dp[i][j-1]>dp[i-1][j]) j--;
+            else i--;
+        }
+        return sb1.reverse().toString();
+       // return longestCommonSubseqPrint(s, sb.reverse().toString());
+    }
+    public static int minInsertionstoPalin(String s){
+        StringBuilder sb = new StringBuilder(s);
+        String s2 = sb.reverse().toString();
+        int n = s.length();
+        int[][] dp = new int[n+1][n+1];
+        for(int i=0;i<=n;i++){
+            dp[i][0]=0;
+            dp[0][i]=0;
+        }
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=n;j++){
+                if(s.charAt(i-1)==s2.charAt(j-1)) dp[i][j] = 1 + dp[i-1][j-1];
+                else dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+        // System.out.print("   ");
+        // for(int i=0;i<=n;i++) System.out.print(i+" ");
+        // System.out.println();
+        // for(int i=0;i<=n;i++){
+        //     System.out.print(i+"  ");
+        //     for(int j=0;j<=n;j++){
+        //         System.out.print(dp[i][j]+" ");
+        //     }
+        //     System.out.println();
+        // }
+        return n-dp[n][n];
+    //   return s.length()-longestCommonSubseq(s,sb.toString());
+    }
+    public static int minOpsAtoB(String s1, String s2){
+        int n = s1.length();
+        int m = s2.length();
+        int[][] dp = new int[n+1][m+1];
+        for(int i=0;i<=n;i++)   dp[i][0]=0;
+        for(int j=0;j<=m;j++)   dp[0][j] = 0;
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                if(s1.charAt(i-1)==s2.charAt(j-1)) dp[i][j] = 1 + dp[i-1][j-1];
+                else dp[i][j]= Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+      //  return n - dp[n][m];
+        return n + m - (2*dp[n][m]);
+    }
+    public static int shortestCommonSuperseq(String s1,String s2){
+        int n = s1.length();
+        int m = s2.length();
+        int[][] dp = new int[n+1][m+1];
+        for(int i=0;i<=n;i++) dp[i][0]=0;
+        for(int i=0;i<=m;i++) dp[0][i]=0;
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                if(s1.charAt(i-1)==s2.charAt(j-1)) dp[i][j] = 1 + dp[i-1][j-1];
+                else dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+        int i=n,j=m;
+        StringBuilder sb = new StringBuilder();
+        String s = s1 + s2;
+        System.out.println(s);
+        while (i>0 && j>0) {
+            if(s1.charAt(i-1)==s2.charAt(j-1)){
+                sb.append(s1.charAt(i-1));
+                i--;
+                j--;
+            }
+            else if(dp[i][j-1] >= dp[i-1][j]){
+                sb.append(s2.charAt(j-1));
+                j--;
+            }
+            else{
+                sb.append(s1.charAt(i-1));
+                i--;
+            }
+        }
+        while (i>0) {
+            sb.append(s1.charAt(i-1));
+            i--;
+        }
+        while (j>0) {
+            sb.append(s2.charAt(j-1));
+            j--;
+        }
+        System.out.println(sb.reverse().toString());
+        return n + m - dp[n][m];
+
+    }
     public static void main(String[] args) {
-        System.out.println(longestCommonSubseq("adebc", "dcadb"));
+        System.out.println(shortestCommonSuperseq("brute", "groot"));
+        // System.out.println(minOpsAtoB("abcd", "anc"));
+       // System.out.println(minInsertionstoPalin("abcaa"));
+        // System.out.println(longestPalindromicSubseq("bbabcbcab"));
+        // System.out.println(longestPalindromicSubseqPrint("bbabcbcab"));
+       // System.out.println(longestCommonSubstring("abcd", "abzd"));
+        //System.out.println(longestCommonSubseqPrint("abcde", "bdgek"));
         // int[] price = {2,5,7,8,10};
         // System.out.println(rodCutting(price, 5));
        // int[] arr = {1,2,3};

@@ -297,30 +297,16 @@ public class Demo {
     }
     public static int longestCommonSubseq(String s1, String s2){
         return longestCommonSubseqHelper(s1, s2, s1.length()-1, s2.length()-1);
-        // Set<String> set1 = new HashSet<>();
-        // Set<String> set2 = new HashSet<>();
-        // longestCommonSubseqHelper(s1, "", set1);
-        // longestCommonSubseqHelper(s2, "", set2);
-        // int size=0;
-        // for(String s : set1){
-        //     if(set2.contains(s)) size = Math.max(size, s.length());
-        // }
-        // return size;
+        
     }
     public static int longestCommonSubseqHelper(String s1,String s2,int idx1,int idx2){
         if(idx1<0 || idx2<0) return 0;
         if(s1.charAt(idx1)==s2.charAt(idx2)) return 1 + longestCommonSubseqHelper(s1, s2, idx1-1, idx2-1);
         else return Math.max(longestCommonSubseqHelper(s1, s2, idx1-1, idx2),longestCommonSubseqHelper(s1, s2, idx1, idx2-1));
     }
-    // public static void longestCommonSubseqHelper(String s,String cur, Set<String> set){
-    //     if(s.length()==0){
-    //         set.add
-    //         (cur);
-    //         return;
-    //     }
 
-    //     longestCommonSubseqHelper(s.substring(1), cur+s.charAt(0), set);
-    //     longestCommonSubseqHelper(s.substring(1), cur, set);
+    // public static int longestCommonSubseqPrint(String s1,String s2){
+
     // }
 
     public static String longestPalindromicSubseq(String s){
